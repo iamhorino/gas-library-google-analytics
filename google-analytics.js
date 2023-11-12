@@ -10,9 +10,9 @@
  * @return { GoogeAnalytics }
  */
 function create(properties, dimensions, metrics, filters, orderCondition, startDate, endDate) {
-    return new GoogeAnalytics(properties, dimensions, metrics, filters, orderCondition, startDate, endDate);
-  }
-  
+  return new GoogeAnalytics(properties, dimensions, metrics, filters, orderCondition, startDate, endDate);
+}
+
 (function(global){
   const GoogeAnalytics = (function() {
     function GoogeAnalytics(properties, dimensions, metrics, filters, orderCondition, startDate, endDate) {
@@ -30,48 +30,63 @@ function create(properties, dimensions, metrics, filters, orderCondition, startD
       try {
         let request = AnalyticsData.newRunReportRequest();
 
-        // 期間のフィルタリング
-        let dateRange = AnalyticsData.newDateRange();
-        dateRange.startDate = startDate;
-        dateRange.endDate = endDate;
-        request.dateRanges = dateRange;
-
-        // Metric： 指標
-        metrics =[];
-        for(var x = 0; x < metricArr.length; x++){
-          let metricx = AnalyticsData.newMetric();
-          metricx.name = metricArr[x];
-          metrics.push(metricx);
-        }
-        request.metrics =metrics;
-
         // Dimension： ディメンション
         dimensions =[];
-        for(var x = 0; x < dimensionArr.length; x++){
+        for (var x = 0; x < dimensionArr.length; x++) {
           let dimensionx = AnalyticsData.newDimension();
           dimensionx.name = dimensionArr[x];
           dimensions.push(dimensionx);
         }
         request.dimensions = dimensions;
 
+        // Metric： 指標
+        metrics =[];
+        for (var x = 0; x < metricArr.length; x++) {
+          let metricx = AnalyticsData.newMetric();
+          metricx.name = metricArr[x];
+          metrics.push(metricx);
+        }
+        request.metrics =metrics;
+
         // Filter: レポートのフィルタ
-        if(filters.length > 0) {
+        if (filters.length > 0) {
+          MATCH_TYPE = ['EXACT', 'BEGINS_WITH', 'ENDS_WITH', 'CONTAINS', 'FULL_REGEXP', 'PARTIAL_REGEXP'];
+          OOERATION = ['EQUAL', 'LESS_THAN', 'LESS_THAN_OR_EQUAL', 'GREATER_THAN', 'GREATER_THAN_OR_EQUAL'];
+          let metricFilter = AnalyticsData.newFilterExpression();
+          metricFilter.andGroup =  AnalyticsData.newFilterExpressionList();
+          metricFilter.andGroup.expressions = [];
           let dimensionfilter = AnalyticsData.newFilterExpression();
           dimensionfilter.andGroup =  AnalyticsData.newFilterExpressionList();
           dimensionfilter.andGroup.expressions = [];
 
-          for(var x = 0; x < filters.length; x++){
-            for(var i = 0; i < filters[x].conditions.length; i++){      
-              let filterExpression = AnalyticsData.newFilterExpression();
-              filterExpression.filter = AnalyticsData.newFilter();
-              filterExpression.filter.fieldName = filters[x].fieldName;
-              filterExpression.filter.stringFilter = AnalyticsData.newStringFilter();
-              filterExpression.filter.stringFilter.value = filters[x].conditions[i];
-              filterExpression.filter.stringFilter.matchType = filters[x].matchType;
-              dimensionfilter.andGroup.expressions.push(filterExpression)
+          for (var x = 0; x < filters.length; x++) {
+            for (var i = 0; i < filters[x].conditions.length; i++) {    
+              if (MATCH_TYPE.includes(filters[x].matchType)) {
+                let filterExpression = AnalyticsData.newFilterExpression();
+                filterExpression.filter = AnalyticsData.newFilter();
+                filterExpression.filter.fieldName = filters[x].fieldName;
+                filterExpression.filter.stringFilter = AnalyticsData.newStringFilter();
+                filterExpression.filter.stringFilter.value = filters[x].conditions[i];
+                filterExpression.filter.stringFilter.matchType = filters[x].matchType;
+                dimensionfilter.andGroup.expressions.push(filterExpression)
+              }
+
+              if (OOERATION.includes(filters[x].matchType)) {
+                let filterExpression = AnalyticsData.newFilterExpression();
+                filterExpression.filter = AnalyticsData.newFilter();
+                filterExpression.filter.fieldName = filters[x].fieldName;
+                filterExpression.filter.numericFilter = AnalyticsData.newNumericFilter();
+                let numericValue = AnalyticsData.newNumericValue();
+                numericValue.doubleValue = filters[x].conditions[i];
+                filterExpression.filter.numericFilter.value = numericValue;
+                filterExpression.filter.numericFilter.operation = filters[x].matchType;
+                metricFilter.andGroup.expressions.push(filterExpression)
+              }
             }
           }
+
           request.dimensionFilter = dimensionfilter;
+          request.metricFilter = metricFilter;
         }
 
         // OrderBy: 並べ替え
@@ -91,6 +106,12 @@ function create(properties, dimensions, metrics, filters, orderCondition, startD
           orderby.desc = (orderCondition[1] == 'desc') ? true : false;
           request.orderBys = [orderby];
         }
+
+        // 期間のフィルタリング
+        let dateRange = AnalyticsData.newDateRange();
+        dateRange.startDate = startDate;
+        dateRange.endDate = endDate;
+        request.dateRanges = dateRange;
 
         const report = AnalyticsData.Properties.runReport(request, `properties/${properties}`);
         if (!report.rows) {
