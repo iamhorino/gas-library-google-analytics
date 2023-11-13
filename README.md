@@ -50,8 +50,8 @@ function myFunction() {
     '2023-10-03' // endDate
   );
   const result = ga.getResult();
-  const header = redash.getHeader();
-  const data = redash.getData();
+  const header = ga.getHeader();
+  const data = ga.getData();
 }
 ```
 ```js
