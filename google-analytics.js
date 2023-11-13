@@ -31,7 +31,7 @@ function create(properties, dimensions, metrics, filters, orderCondition, startD
         let request = AnalyticsData.newRunReportRequest();
 
         // Dimension： ディメンション
-        dimensions =[];
+        dimensions = [];
         for (var x = 0; x < dimensionArr.length; x++) {
           let dimensionx = AnalyticsData.newDimension();
           dimensionx.name = dimensionArr[x];
@@ -40,7 +40,7 @@ function create(properties, dimensions, metrics, filters, orderCondition, startD
         request.dimensions = dimensions;
 
         // Metric： 指標
-        metrics =[];
+        metrics = [];
         for (var x = 0; x < metricArr.length; x++) {
           let metricx = AnalyticsData.newMetric();
           metricx.name = metricArr[x];
@@ -51,13 +51,13 @@ function create(properties, dimensions, metrics, filters, orderCondition, startD
         // Filter: レポートのフィルタ
         if (filters.length > 0) {
           MATCH_TYPE = ['EXACT', 'BEGINS_WITH', 'ENDS_WITH', 'CONTAINS', 'FULL_REGEXP', 'PARTIAL_REGEXP'];
-          OOERATION = ['EQUAL', 'LESS_THAN', 'LESS_THAN_OR_EQUAL', 'GREATER_THAN', 'GREATER_THAN_OR_EQUAL'];
+          OPERATION = ['EQUAL', 'LESS_THAN', 'LESS_THAN_OR_EQUAL', 'GREATER_THAN', 'GREATER_THAN_OR_EQUAL'];
           let metricFilter = AnalyticsData.newFilterExpression();
-          metricFilter.andGroup =  AnalyticsData.newFilterExpressionList();
+          metricFilter.andGroup = AnalyticsData.newFilterExpressionList();
           metricFilter.andGroup.expressions = [];
-          let dimensionfilter = AnalyticsData.newFilterExpression();
-          dimensionfilter.andGroup =  AnalyticsData.newFilterExpressionList();
-          dimensionfilter.andGroup.expressions = [];
+          let dimensionFilter = AnalyticsData.newFilterExpression();
+          dimensionFilter.andGroup = AnalyticsData.newFilterExpressionList();
+          dimensionFilter.andGroup.expressions = [];
 
           for (var x = 0; x < filters.length; x++) {
             for (var i = 0; i < filters[x].conditions.length; i++) {    
@@ -68,10 +68,10 @@ function create(properties, dimensions, metrics, filters, orderCondition, startD
                 filterExpression.filter.stringFilter = AnalyticsData.newStringFilter();
                 filterExpression.filter.stringFilter.value = filters[x].conditions[i];
                 filterExpression.filter.stringFilter.matchType = filters[x].matchType;
-                dimensionfilter.andGroup.expressions.push(filterExpression)
+                dimensionFilter.andGroup.expressions.push(filterExpression)
               }
 
-              if (OOERATION.includes(filters[x].matchType)) {
+              if (OPERATION.includes(filters[x].matchType)) {
                 let filterExpression = AnalyticsData.newFilterExpression();
                 filterExpression.filter = AnalyticsData.newFilter();
                 filterExpression.filter.fieldName = filters[x].fieldName;
@@ -85,7 +85,7 @@ function create(properties, dimensions, metrics, filters, orderCondition, startD
             }
           }
 
-          request.dimensionFilter = dimensionfilter;
+          request.dimensionFilter = dimensionFilter;
           request.metricFilter = metricFilter;
         }
 
