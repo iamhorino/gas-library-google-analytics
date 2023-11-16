@@ -38,16 +38,19 @@ function myFunction() {
 // GAS
 function myFunction() {
   const ga = GoogleAnalytics.create(
-    'xxxxxxxxx', // GA4プロパティID
+    'xxxxxxxxx', // GA4プロパティ
     ['date'], // dimentions
     ['sessions'], // metrics
     [
       {'fieldName': 'firstUserSourceMedium', 'conditions': ['organic'], 'matchType': 'CONTAINS'},
       {'fieldName': 'landingPagePlusQueryString', 'conditions': ['/articles/[0-9]+'], 'matchType': 'FULL_REGEXP'}
-    ], // filters
+    ], // dimensionFilters
+    [
+      {'fieldName': 'sessions', 'conditions': [50000], 'operation': 'GREATER_THAN'}
+    ], // metricFilters
     ['sessions', 'desc'], // orderCondition
     '2023-10-01', // startDate
-    '2023-10-03' // endDate
+    '2023-10-02' // endDate
   );
   const result = ga.getResult();
   const header = ga.getHeader();
