@@ -13,6 +13,28 @@ function create(properties, dimensions, metrics, filters, orderCondition, startD
   return new GoogeAnalytics(properties, dimensions, metrics, filters, orderCondition, startDate, endDate);
 }
 
+/**
+ * ディメンションとして設定可能な項目のリストを取得するためのメソッド
+ * @param { string } properties プロパティ名を指定
+ * @return { array } usableDimentions ディメンションとして設定可能な項目リスト
+ */
+function getUsableDimentions(properties) {
+  const dimentionMetadata = AnalyticsData.Properties.getMetadata(`properties/${properties}/metadata`).dimensions;
+  const usableDimentions = dimentionMetadata.map((obj) => obj.apiName);
+  return usableDimentions; 
+}
+
+/**
+ * 指標として設定可能な項目のリストを取得するためのメソッド
+ * @param { string } properties プロパティ名を指定
+ * @return { array } usableMetrics 指標として設定可能な項目リスト
+ */
+function getUsableMetrics(properties) {
+  const metricMetadata = AnalyticsData.Properties.getMetadata(`properties/${properties}/metadata`).metrics;
+  const usableMetrics = metricMetadata.map((obj) => obj.apiName);
+  return usableMetrics; 
+}
+
 (function(global){
   const GoogeAnalytics = (function() {
     function GoogeAnalytics(properties, dimensions, metrics, filters, orderCondition, startDate, endDate) {
