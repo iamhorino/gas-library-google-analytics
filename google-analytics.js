@@ -5,13 +5,13 @@
  * @param { array } metrics 指標を指定
  * @param { array } dimensionFilters ディメンションの絞り込み条件を指定
  * @param { array } metricFilters 指標の絞り込み条件を指定
- * @param { array } orderCondition ソートの条件を指定
+ * @param { array } orderBys ソートの条件を指定
  * @param { string } startDate 期間の始点を「xxxx-xx-xx」形式で指定
  * @param { string } endDate 期間の終点を「xxxx-xx-xx」形式で指定
  * @return { GoogeAnalytics }
  */
-function create(properties, dimensions, metrics, dimensionFilters, metricFilters, orderCondition, startDate, endDate) {
-  return new GoogeAnalytics(properties, dimensions, metrics, dimensionFilters, metricFilters, orderCondition, startDate, endDate);
+function create(properties, dimensions, metrics, dimensionFilters, metricFilters, orderBys, startDate, endDate) {
+  return new GoogeAnalytics(properties, dimensions, metrics, dimensionFilters, metricFilters, orderBys, startDate, endDate);
 }
 
 /**
@@ -38,19 +38,19 @@ function getUsableMetrics(properties) {
 
 (function(global){
   const GoogeAnalytics = (function() {
-    function GoogeAnalytics(properties, dimensions, metrics, dimensionFilters, metricFilters, orderCondition, startDate, endDate) {
+    function GoogeAnalytics(properties, dimensions, metrics, dimensionFilters, metricFilters, orderBys, startDate, endDate) {
       this.properties = properties;
       this.dimensions = dimensions;
       this.metrics = metrics;
       this.dimensionFilters = dimensionFilters;
       this.metricFilters = metricFilters;
-      this.orderCondition = orderCondition;
+      this.orderCondition = orderBys;
       this.startDate = startDate; // yyyy-MM-ddで入力
       this.endDate = endDate; // yyyy-MM-ddで入力
-      this.result = createReport(this.properties, this.dimensions, this.metrics, this.dimensionFilters, this.metricFilters, this.orderCondition, this.startDate, this.endDate);
+      this.result = createReport(this.properties, this.dimensions, this.metrics, this.dimensionFilters, this.metricFilters, this.orderBys, this.startDate, this.endDate);
     }
 
-    const createReport = (properties, dimensionArr, metricArr, dimensionFilters, metricFilters, orderCondition, startDate, endDate) => {
+    const createReport = (properties, dimensionArr, metricArr, dimensionFilters, metricFilters, orderBys, startDate, endDate) => {
       try {
         let request = AnalyticsData.newRunReportRequest();
 
@@ -122,21 +122,21 @@ function getUsableMetrics(properties) {
           request.metricFilter = metricFilter;
         }
 
-        // OrderBy: 並べ替え
-        if (dimensionArr.includes(orderCondition[0])) {
+        // orderBys: 並べ替え
+        if (dimensionArr.includes(orderBys[0])) {
           let dimensionOrderBy = AnalyticsData.newDimensionOrderBy();
-          dimensionOrderBy.dimensionName = orderCondition[0];
+          dimensionOrderBy.dimensionName = orderBys[0];
           let orderby = AnalyticsData.newOrderBy();
           orderby.dimension = dimensionOrderBy;
-          orderby.desc = (orderCondition[1] == 'desc') ? true : false;
+          orderby.desc = (orderBys[1] == 'desc') ? true : false;
           request.orderBys = [orderby];
         }
-        if (metricArr.includes(orderCondition[0])) {
+        if (metricArr.includes(orderBys[0])) {
           let metricOrderBy = AnalyticsData.newMetricOrderBy();
-          metricOrderBy.metricName = orderCondition[0];
+          metricOrderBy.metricName = orderBys[0];
           let orderby = AnalyticsData.newOrderBy();
           orderby.metric = metricOrderBy;
-          orderby.desc = (orderCondition[1] == 'desc') ? true : false;
+          orderby.desc = (orderBys[1] == 'desc') ? true : false;
           request.orderBys = [orderby];
         }
 

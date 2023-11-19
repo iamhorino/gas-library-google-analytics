@@ -25,7 +25,7 @@ function myFunction() {
     ['date'], // dimentions
     ['sessions'], // metrics
     [], // filters
-    ['date', 'asc'], // orderCondition
+    ['date', 'asc'], // orderBys
     '2023-10-01', // startDate
     '2023-10-03' // endDate
   );
@@ -48,7 +48,7 @@ function myFunction() {
     [
       {'fieldName': 'sessions', 'conditions': [50000], 'operation': 'GREATER_THAN'}
     ], // metricFilters
-    ['sessions', 'desc'], // orderCondition
+    ['sessions', 'desc'], // orderBys
     '2023-10-01', // startDate
     '2023-10-02' // endDate
   );
