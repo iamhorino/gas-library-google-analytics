@@ -44,7 +44,7 @@ function getUsableMetrics(properties) {
       this.metrics = metrics;
       this.dimensionFilters = dimensionFilters;
       this.metricFilters = metricFilters;
-      this.orderCondition = orderBys;
+      this.orderBys = orderBys;
       this.startDate = startDate; // yyyy-MM-ddで入力
       this.endDate = endDate; // yyyy-MM-ddで入力
       this.result = createReport(this.properties, this.dimensions, this.metrics, this.dimensionFilters, this.metricFilters, this.orderBys, this.startDate, this.endDate);
